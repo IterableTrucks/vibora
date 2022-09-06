@@ -1,6 +1,7 @@
 import re
 import pathlib
 from setuptools import setup, Extension, find_packages
+from Cython.Build import cythonize
 
 # Loading version
 here = pathlib.Path(__file__).parent
@@ -26,99 +27,72 @@ setup(
     ],
     extras_require={
         'dev': ['flake8', 'pytest', 'tox'],
-        'fast': ['ujson==1.35', 'uvloop==0.10.2']
+        'fast': ['ujson', 'uvloop']
     },
-    ext_modules=[
+    ext_modules=cythonize([
         Extension(
-            "vibora.parsers.parser",
+            "vibora.parsers.*",
             [
-                "vibora/parsers/parser.c",
+                "vibora/parsers/*.pyx",
                 "vendor/http-parser-2.8.1/http_parser.c",
             ],
             extra_compile_args=['-O3'],
             include_dirs=['.', '/git/vibora/vibora']
         ),
         Extension(
-            "vibora.parsers.response",
-            [
-                "vibora/parsers/response.c",
-                "vendor/http-parser-2.8.1/http_parser.c"
-            ],
-            extra_compile_args=['-O3'],
-            include_dirs=['.', '/git/vibora/vibora']
-        ),
-        Extension(
             "vibora.router.router",
-            ["vibora/router/router.c"],
+            ["vibora/router/router.py"],
             extra_compile_args=['-O3'],
             include_dirs=['.']
         ),
         Extension(
             "vibora.responses.responses",
-            ["vibora/responses/responses.c"],
+            ["vibora/responses/responses.pyx"],
             extra_compile_args=['-O3'],
             include_dirs=['.']
         ),
         Extension(
-            "vibora.protocol.cprotocol",
-            ["vibora/protocol/cprotocol.c"],
-            extra_compile_args=['-O3'],
-            include_dirs=['.']
-        ),
-        Extension(
-            "vibora.protocol.cwebsocket",
-            ["vibora/protocol/cwebsocket.c"],
+            "vibora.protocol.*",
+            ["vibora/protocol/*.pyx"],
             extra_compile_args=['-O3'],
             include_dirs=['.']
         ),
         Extension(
             "vibora.request.request",
-            ["vibora/request/request.c"],
+            ["vibora/request/request.pyx"],
             extra_compile_args=['-O3'],
             include_dirs=['.']
         ),
         Extension(
             "vibora.cache.cache",
-            ["vibora/cache/cache.c"],
+            ["vibora/cache/cache.py"],
             extra_compile_args=['-O3'],
             include_dirs=['.']
         ),
         Extension(
             "vibora.headers.headers",
-            ["vibora/headers/headers.c"],
+            ["vibora/headers/headers.py"],
             extra_compile_args=['-O3'],
             include_dirs=['.']
         ),
         Extension(
-            "vibora.schemas.extensions.fields",
-            ["vibora/schemas/extensions/fields.c"],
-            extra_compile_args=['-O3'],
-            include_dirs=['.', 'vibora/schemas']
-        ),
-        Extension(
-            "vibora.schemas.extensions.schemas",
-            ["vibora/schemas/extensions/schemas.c"],
-            extra_compile_args=['-O3'],
-            include_dirs=['.', 'vibora/schemas']
-        ),
-        Extension(
-            "vibora.schemas.extensions.validator",
-            ["vibora/schemas/extensions/validator.c"],
+            "vibora.schemas.extensions.*",
+            ["vibora/schemas/extensions/*.pyx"],
             extra_compile_args=['-O3'],
             include_dirs=['.', 'vibora/schemas']
         ),
         Extension(
             "vibora.components.components",
-            ["vibora/components/components.c"],
+            ["vibora/components/components.pyx"],
             extra_compile_args=['-O3'],
             include_dirs=['.']
         ),
         Extension(
             "vibora.multipart.parser",
-            ["vibora/multipart/parser.c"],
+            ["vibora/multipart/parser.pyx"],
             extra_compile_args=['-O3'],
             include_dirs=['.']
         )
-    ],
+    ]),
     packages=find_packages()
 )
